@@ -1,0 +1,60 @@
+1、用于注释掉一段代码
+我们自己编写程序的时候，需要看到一系列的调试代码，但是发给客户的时候，客户可不希望看到什么什么OK的代码，所以我们希望能很容易地注释掉这段代码。 
+这时需要用到预处理指令 #ifdef 和 #endif ：
+
+#include <stdio.h>
+#define CONFIG_DEBUG 
+int main(){
+    FILE *fp;
+    fp=fopen("D:\\DEV\\test.txt","r"); 
+    if(NULL==fp){
+        printf("error!");
+    }
+#ifdef CONFIG_DEBUG 
+    printf("open test.txt ok");
+#endif
+    return 0;
+}
+
+如果文件在那个路径没错的话，将会打印如下信息：
+open test.txt ok
+------------------------
+读取的文本信息。。。。
+
+
+如果不想要看到这样的调试信息的话，注释掉#define CONFIG_DEBUG这句就行。
+
+
+
+2、防止头文件重复包含
+a.h
+
+#include <stdio.h>
+#include "b.h"
+1
+2
+b.h
+
+#include "a.h"
+1
+c.c
+
+#include "a.h"
+#include "b.h"
+int main(){
+    printf("Hello!");
+}
+1
+2
+3
+4
+5
+如果你程序是这样写的话，编译器就会出现Error #include nested too deeply的错误。 
+因为这里 b.h 和 a.h 都互相包含，c.c文件在include的时候重复include了a.h，我们希望c.c文件中执行#include "b.h"的时候 b.h 能进行判断，如果没有#include "a.h"则include，如果已经include了，则不再重复定义。
+
+可以将b.h修改为：
+
+#ifndef _A_H
+#define _A_H 
+#include "a.h"
+#endif
